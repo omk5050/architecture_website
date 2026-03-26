@@ -26,6 +26,9 @@ export const submitContact = async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
   }
 };

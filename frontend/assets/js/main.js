@@ -1035,70 +1035,89 @@
   })(jQuery);
   
   
-  // === CONTACT FORM API ===
+// ================= CONTACT FORM API =================
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("contact__form");
+  const btnText = document.getElementById("btnText");
+  const loader = document.getElementById("btnLoader");
+  const button = document.getElementById("submitBtn");
+  const successBox = document.getElementById("successContainer");
 
   if (!form) return;
 
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
+    // reset states
+    successBox.style.display = "none";
+
     const data = {
-      name: document.getElementById("name2").value,
-      email: document.getElementById("email2").value,
-      phone: document.getElementById("phone").value,
-      company: document.getElementById("company").value,
-      budget: document.getElementById("Budget").value,
-      solution: document.getElementById("solution").value,
-      message: document.getElementById("message").value,
+      name: document.getElementById("name").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      company: document.getElementById("company").value.trim(),
+      budget: document.getElementById("budget").value,
+      solution: document.getElementById("solution").value.trim(),
+      message: document.getElementById("message").value.trim(),
     };
 
+    // 🔴 strict validation (you were too loose)
+    if (!data.name || !data.email || !data.phone || !data.message) {
+      alert("Fill all required fields");
+      return;
+    }
+
+    // 🔴 email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      alert("Invalid email format");
+      return;
+    }
+
+    // 🔴 phone validation (numbers only, 10 digits)
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(data.phone)) {
+      alert("Phone must be 10 digits");
+      return;
+    }
+
+    // 🔥 START LOADING
+    btnText.style.display = "none";
+    loader.style.display = "inline-block";
+    button.disabled = true;
+
     try {
-      const res = await fetch("http://localhost:5000/api/contact", {
+      const res = await fetch("https://architecture-website-sjh4.onrender.com/api/contact", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data)
       });
 
       const result = await res.json();
 
-      document.getElementById("response-message").innerText = result.message;
-      form.reset();
+      if (result.success) {
+        form.reset();
+
+        // ✅ SHOW SUCCESS ANIMATION
+        successBox.style.display = "flex";
+
+        // 🔥 FORCE SVG ANIMATION RESTART
+        const svg = document.getElementById("successTick");
+        svg.innerHTML = svg.innerHTML;
+
+      } else {
+        alert("Failed to send message");
+      }
 
     } catch (err) {
-      document.getElementById("response-message").innerText = "Error sending message";
+      alert("Server error");
+    } finally {
+      // 🔥 STOP LOADING
+      btnText.style.display = "inline";
+      loader.style.display = "none";
+      button.disabled = false;
     }
   });
-});
-
-document.querySelector("#contact__form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const data = {
-    name: document.querySelector("#name").value,
-    email: document.querySelector("#email").value,
-    phone: document.querySelector("#phone").value,
-    company: document.querySelector("#company").value,
-    budget: document.querySelector("#budget").value,
-    solution: document.querySelector("#solution").value,
-    message: document.querySelector("#message").value
-  };
-
-  try {
-    const res = await fetch("https://architecture-website-sjh4.onrender.com/api/contact", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
-
-    const result = await res.json();
-    document.getElementById("response-message").innerText = result.message;
-  } catch (err) {
-    console.error(err);
-  }
 });
