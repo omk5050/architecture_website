@@ -1122,44 +1122,71 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-const subscribeForm = document.querySelector(".subscribe-form");
-subscribeForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+// ================= SUBSCRIBE FORM =================
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("subscribeForm");
+  if (!form) return;
 
-  const name = subscribeForm.querySelector(".sub-name").value.trim();
-  const email = subscribeForm.querySelector(".sub-email").value.trim();
+  const emailInput = document.getElementById("subEmail");
+  const nameInput = document.getElementById("subName");
+  const messageEl = document.getElementById("subMessage");
 
-  // validation
-  if (!email) {
-    alert("Email required");
-    return;
-  }
+  const btn = document.getElementById("subBtn");
+  const loader = document.getElementById("subLoader");
+  const text = document.getElementById("subBtnText");
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    alert("Invalid email");
-    return;
-  }
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  try {
-    const res = await fetch("https://architecture-website-sjh4.onrender.com/api/subscribe", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ name, email })
-    });
+    const email = emailInput.value.trim();
+    const name = nameInput.value.trim();
 
-    const data = await res.json();
+    // validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (data.success) {
-      alert("Subscribed successfully");
-      subscribeForm.reset();
-    } else {
-      alert(data.message);
+    if (!emailRegex.test(email)) {
+      messageEl.textContent = "Invalid email";
+      messageEl.style.color = "red";
+      return;
     }
 
-  } catch (err) {
-    alert("Server error");
-  }
+    // loading UI
+    text.style.display = "none";
+    loader.style.display = "inline-block";
+    btn.disabled = true;
+
+    try {
+      const res = await fetch("https://architecture-website-sjh4.onrender.com/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          website: "" // honeypot
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        messageEl.textContent = "Subscribed successfully ✔";
+        messageEl.style.color = "green";
+        form.reset();
+      } else {
+        messageEl.textContent = data.message;
+        messageEl.style.color = "red";
+      }
+
+    } catch (err) {
+      messageEl.textContent = "Server error";
+      messageEl.style.color = "red";
+    }
+
+    // reset UI
+    text.style.display = "inline";
+    loader.style.display = "none";
+    btn.disabled = false;
+  });
 });

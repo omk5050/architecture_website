@@ -294,20 +294,23 @@
                     <div class="container rr-container-1650">
                         <div class="footer-widget-wrapper">
                             <div class="footer-widget-box">
-                                <form class="subscribe-form">
+                                <form class="subscribe-form" id="subscribeForm">
                                     <h2 class="title">Subscribe</h2>
 
                                     <div class="input-group">
-                                        <input type="text" name="name" class="sub-name" placeholder="Name">
+                                        <input type="text" id="subName" placeholder="Name" required>
                                     </div>
 
                                     <div class="input-group">
-                                        <input type="email" name="email" class="sub-email"
-                                            placeholder="Enter your email" required>
-                                        <button type="submit">
-                                            <i class="fa-regular fa-arrow-right-long"></i>
+                                        <input type="email" id="subEmail" placeholder="Enter your email" required>
+
+                                        <button type="submit" id="subBtn">
+                                            <span id="subBtnText">→</span>
+                                            <span id="subLoader" style="display:none;">⏳</span>
                                         </button>
                                     </div>
+
+                                    <p id="subMessage"></p>
                                 </form>
                                 <div class="copyright-text">
                                     <p class="text"> <a href="https://themeforest.net/user/ravextheme">© RavexTheme.</a>

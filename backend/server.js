@@ -24,12 +24,20 @@ const contactLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const subscribeLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 3,
+  message: {
+    message: "Too many subscriptions. Try later."
+  }
+});
+
 // Now env is available
 connectDB();
 
 app.use("/api/contact", contactLimiter, contactRoutes);
 
-app.use("/api/subscribe", subscriberRoutes);
+app.use("/api/subscribe", subscribeLimiter, subscriberRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
