@@ -1122,4 +1122,44 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+const subscribeForm = document.querySelector(".subscribe-form");
+subscribeForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
+  const name = subscribeForm.querySelector(".sub-name").value.trim();
+  const email = subscribeForm.querySelector(".sub-email").value.trim();
+
+  // validation
+  if (!email) {
+    alert("Email required");
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert("Invalid email");
+    return;
+  }
+
+  try {
+    const res = await fetch("https://architecture-website-sjh4.onrender.com/api/subscribe", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name, email })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert("Subscribed successfully");
+      subscribeForm.reset();
+    } else {
+      alert(data.message);
+    }
+
+  } catch (err) {
+    alert("Server error");
+  }
+});
