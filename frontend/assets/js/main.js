@@ -1073,3 +1073,32 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+document.querySelector("#contact__form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const data = {
+    name: document.querySelector("#name").value,
+    email: document.querySelector("#email").value,
+    phone: document.querySelector("#phone").value,
+    company: document.querySelector("#company").value,
+    budget: document.querySelector("#budget").value,
+    solution: document.querySelector("#solution").value,
+    message: document.querySelector("#message").value
+  };
+
+  try {
+    const res = await fetch("https://architecture-website-sjh4.onrender.com/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    document.getElementById("response-message").innerText = result.message;
+  } catch (err) {
+    console.error(err);
+  }
+});
