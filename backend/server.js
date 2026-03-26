@@ -1,3 +1,4 @@
+import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 dotenv.config();   // MUST be first
 
@@ -11,10 +12,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const contactLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 5,
+  message: {
+    success: false,
+    message: "Too many requests. Try again later."
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 // Now env is available
 connectDB();
 
-app.use("/api/contact", contactRoutes);
+app.use("/api/contact", contactLimiter, contactRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
