@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "server.js",
-  "type": "module",   
+  "type": "module",
   "scripts": {
     "start": "node server.js"
   },
@@ -10,6 +10,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "mongoose": "^9.3.2"
+    "mongoose": "^9.3.2",
+    "resend": "^6.9.4"
   }
 }
