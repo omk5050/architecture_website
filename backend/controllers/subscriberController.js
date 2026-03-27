@@ -1,52 +1,89 @@
-import Subscriber from "../models/subscriber.js";
+import Subscriber from "../models/Subscriber.js";
+import crypto from "crypto";
+import { sendEmail } from "../utils/sendEmail.js";
 
+// SUBSCRIBE
 export const subscribe = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { email, name, website } = req.body;
 
-    // 1. Validate input
+    // Honeypot anti-spam
+    if (website) {
+      return res.status(400).json({ message: "Spam detected" });
+    }
+
+    // Validation
     if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+      return res.status(400).json({ message: "Email required" });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
+      return res.status(400).json({ message: "Invalid email" });
     }
 
-    // 2. Anti-spam honeypot
-    if (req.body.website) {
-      return res.status(400).json({ message: "Spam detected" });
+    // Check existing
+    let user = await Subscriber.findOne({ email });
+
+    if (user && user.isVerified) {
+      return res.status(400).json({ message: "Already subscribed" });
     }
 
-    // 3. Check duplicate
-    const exists = await Subscriber.findOne({ email });
-    if (exists) {
-      return res.status(409).json({ message: "Already subscribed" });
+    // Generate token
+    const token = crypto.randomBytes(32).toString("hex");
+
+    if (!user) {
+      user = await Subscriber.create({
+        name,
+        email,
+        verificationToken: token,
+      });
+    } else {
+      user.verificationToken = token;
+      await user.save();
     }
 
-    // 4. Save with metadata
-    const newSub = await Subscriber.create({
-      name,
+    // Email link
+    const verifyLink = `${process.env.BASE_URL}/api/subscribe/verify/${token}`;
+
+    await sendEmail(
       email,
-      ip: req.ip,
-      userAgent: req.headers["user-agent"]
-    });
+      "Verify your subscription",
+      `
+        <h2>Confirm your email</h2>
+        <p>Click below to verify:</p>
+        <a href="${verifyLink}" target="_blank">Verify Email</a>
+      `
+    );
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: "Subscribed successfully",
-      data: newSub
+      message: "Verification email sent",
     });
 
   } catch (err) {
-    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
-    // Handle duplicate key error (DB-level safety)
-    if (err.code === 11000) {
-      return res.status(409).json({ message: "Already subscribed" });
+// VERIFY
+export const verifySubscriber = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    const user = await Subscriber.findOne({ verificationToken: token });
+
+    if (!user) {
+      return res.status(400).send("Invalid or expired token");
     }
 
-    res.status(500).json({ message: "Server error" });
+    user.isVerified = true;
+    user.verificationToken = null;
+    await user.save();
+
+    res.send("Email verified successfully ✔");
+
+  } catch (err) {
+    res.status(500).send("Server error");
   }
 };

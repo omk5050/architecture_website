@@ -1,20 +1,17 @@
 import mongoose from "mongoose";
 
 const subscriberSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-    maxlength: 100
-  },
+  name: String,
   email: {
     type: String,
     required: true,
     unique: true,
-    lowercase: true,
-    trim: true
   },
-  ip: String,
-  userAgent: String
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: String,
 }, { timestamps: true });
 
 export default mongoose.model("Subscriber", subscriberSchema);
