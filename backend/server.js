@@ -7,7 +7,6 @@ import cors from "cors";
 import subscriberRoutes from "./routes/subscriberRoutes.js";
 import { connectDB } from "./config/db.js";
 import contactRoutes from "./routes/contactRoutes.js";
-import { createBlog } from "../controllers/blogController.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 

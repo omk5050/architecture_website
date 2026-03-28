@@ -1211,3 +1211,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+//ADMIN
+const token = localStorage.getItem("adminToken");
+
+async function createBlog() {
+  const formData = new FormData();
+  formData.append("title", title.value);
+  formData.append("content", content.value);
+  formData.append("image", image.files[0]);
+
+  await fetch("/api/blogs", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData
+  });
+}
