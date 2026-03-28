@@ -41,6 +41,9 @@ app.use("/api/contact", contactLimiter, contactRoutes);
 
 app.use("/api/subscribe", subscribeLimiter, subscriberRoutes);
 
+app.use("/api/admin", adminRoutes);
+app.use("/api/blogs", blogRoutes);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
