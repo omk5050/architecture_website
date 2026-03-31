@@ -1,4 +1,4 @@
-const API = "https://architecture-website-sjh4.onrender.com/api/blogs";
+const API = "https://architecture-website-sjh4.onrender.com/api";
 
 const token = localStorage.getItem("token");
 
@@ -7,12 +7,13 @@ if (!token) {
   window.location.href = "login.html";
 }
 
+// LOAD BLOGS
 async function loadBlogs() {
   try {
     const res = await fetch(`${API}/blogs`);
     const data = await res.json();
 
-    const container = document.getElementById("blogsContainer");
+    const container = document.getElementById("blogContainer");
     container.innerHTML = "";
 
     data.data.forEach(blog => {
@@ -34,25 +35,6 @@ async function loadBlogs() {
   } catch (err) {
     console.error("LOAD BLOG ERROR:", err);
   }
-}
-
-// LOAD BLOGS
-async function loadBlogs() {
-  const res = await fetch(API);
-  const data = await res.json();
-
-  const container = document.getElementById("blogList");
-  container.innerHTML = "";
-
-  data.data.forEach(blog => {
-    container.innerHTML += `
-      <div class="blog-item">
-        <h4>${blog.title}</h4>
-        <p>${blog.content}</p>
-        <button onclick="deleteBlog('${blog._id}')">Delete</button>
-      </div>
-    `;
-  });
 }
 
 // CREATE BLOG
@@ -79,7 +61,7 @@ document.getElementById("blogForm")?.addEventListener("submit", async (e) => {
 
 // DELETE BLOG
 async function deleteBlog(id) {
-  await fetch(`${API}/${id}`, {
+  await fetch(`${API}/blogs/${id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`
