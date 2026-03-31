@@ -20,7 +20,7 @@ export const createBlog = async (req, res) => {
 
   } catch (error) {
     console.error("CREATE BLOG ERROR:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: error.message, full: error });
   }
 };
 
