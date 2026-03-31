@@ -1,26 +1,46 @@
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
+import streamifier from "streamifier";
 
-// Cloudinary config
+// ✅ Cloudinary config (FIXED ENV NAMES)
 cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.CLOUD_KEY,
-  api_secret: process.env.CLOUD_SECRET
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Multer setup (memory storage)
+// ✅ Multer memory storage
 const storage = multer.memoryStorage();
-export const upload = multer({ storage });
 
-// Upload function
-export const uploadToCloudinary = async (file) => {
+export const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit (optional but recommended)
+  }
+});
+
+// ✅ Upload function (SAFE STREAM VERSION)
+export const uploadToCloudinary = (file) => {
   return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload_stream(
-      { folder: "blogs" }, // optional folder
+
+    if (!file) {
+      return resolve("");
+    }
+
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "blogs"
+      },
       (error, result) => {
-        if (error) reject(error);
-        else resolve(result.secure_url);
+        if (error) {
+          console.error("CLOUDINARY ERROR:", error);
+          reject(error);
+        } else {
+          resolve(result.secure_url);
+        }
       }
-    ).end(file.buffer);
+    );
+
+    streamifier.createReadStream(file.buffer).pipe(stream);
   });
 };
