@@ -7,6 +7,35 @@ if (!token) {
   window.location.href = "login.html";
 }
 
+async function loadBlogs() {
+  try {
+    const res = await fetch(`${API}/blogs`);
+    const data = await res.json();
+
+    const container = document.getElementById("blogsContainer");
+    container.innerHTML = "";
+
+    data.data.forEach(blog => {
+      const div = document.createElement("div");
+
+      div.innerHTML = `
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+          <h3>${blog.title}</h3>
+          <p>${blog.content}</p>
+          ${blog.image ? `<img src="${blog.image}" width="200"/>` : ""}
+          
+          <button onclick="deleteBlog('${blog._id}')">Delete</button>
+        </div>
+      `;
+
+      container.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error("LOAD BLOG ERROR:", err);
+  }
+}
+
 // LOAD BLOGS
 async function loadBlogs() {
   const res = await fetch(API);
