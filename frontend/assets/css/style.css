@@ -9253,6 +9253,25 @@ section {
   }
 }
 
+.admin-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #111;
+  color: white;
+  padding: 10px 12px;
+  border-radius: 50%;
+  font-size: 18px;
+  text-decoration: none;
+  opacity: 0.6;
+  transition: 0.3s;
+}
+
+.admin-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
 /* === page-title  === */
 .page-title-area .page-title-area-inner {
   padding-top: 250px;
