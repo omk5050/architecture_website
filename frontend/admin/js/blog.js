@@ -47,45 +47,41 @@ async function loadBlogs() {
 }
 
 // CREATE BLOG
-document.getElementById("blogForm")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
+const form = document.getElementById("blogForm");
 
-  const formData = new FormData();
-  formData.append("title", document.getElementById("title").value);
-  formData.append("content", document.getElementById("content").value);
+if (!form) {
+  console.error("Form not found");
+} else {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const file = document.getElementById("image").files[0];
-  if (file) formData.append("image", file);
+    console.log("FORM SUBMIT TRIGGERED");
 
-  const res = await fetch(API, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-    body: formData
-  });
+    const formData = new FormData();
+    formData.append("title", document.getElementById("title").value);
+    formData.append("content", document.getElementById("content").value);
 
-  const data = await res.json();
-  console.log("CREATE BLOG RESPONSE:", data);
+    const file = document.getElementById("image").files[0];
+    if (file) formData.append("image", file);
 
-  if (!res.ok) {
-    alert(data.message || "Failed to create blog");
-    return;
-  }
-  console.log("FORM SUBMIT TRIGGERED");
-  loadBlogs();
-});
+    const res = await fetch(API, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: formData
+    });
 
-// DELETE BLOG
-async function deleteBlog(id) {
-  await fetch(`${API}/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`
+    const data = await res.json();
+    console.log("CREATE BLOG RESPONSE:", data);
+
+    if (!res.ok) {
+      alert(data.message || "Failed to create blog");
+      return;
     }
-  });
 
-  loadBlogs();
+    loadBlogs();
+  });
 }
 
 // INIT
