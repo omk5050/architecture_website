@@ -21,7 +21,6 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
-app.options("*", cors());
 
 const contactLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
