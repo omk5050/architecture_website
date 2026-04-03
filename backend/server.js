@@ -16,11 +16,12 @@ const app = express();
 app.set("trust proxy", 1);
 
 app.use(cors({
-  origin: "*",
+  origin: "http://127.0.0.1:5500",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
+app.options("*", cors());
 
 const contactLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min

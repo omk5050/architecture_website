@@ -8,6 +8,7 @@ if (!token) {
 
 // LOAD BLOGS
 async function loadBlogs() {
+  console.log("Loading blogs...");
   try {
     const res = await fetch(API, {
       headers: {
@@ -15,7 +16,7 @@ async function loadBlogs() {
       }
     });
     const data = await res.json();
-    console.log("BLOG DATA:", data);4
+    console.log("BLOG DATA:", data);
 
     if (!data.data) {
       console.error("No data field in response");
@@ -23,7 +24,11 @@ async function loadBlogs() {
     }
 
     const container = document.getElementById("blogContainer");
-    container.innerHTML = "";
+
+    if (!container) {
+      console.error("blogContainer not found");
+      return;
+    }
 
     data.data.forEach(blog => {
       container.innerHTML += `
@@ -39,7 +44,6 @@ async function loadBlogs() {
   } catch (err) {
     console.error("LOAD BLOG ERROR:", err);
   }
-  console.log("Loading blogs...");
 }
 
 // CREATE BLOG
