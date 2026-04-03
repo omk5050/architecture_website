@@ -9,10 +9,18 @@ if (!token) {
 // LOAD BLOGS
 async function loadBlogs() {
   try {
-    const res = await fetch(API);
+    const res = await fetch(API, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     const data = await res.json();
+    console.log("BLOG DATA:", data);4
 
-    console.log("BLOG DATA:", data);
+    if (!data.data) {
+      console.error("No data field in response");
+      return;
+    }
 
     const container = document.getElementById("blogContainer");
     container.innerHTML = "";
@@ -31,6 +39,7 @@ async function loadBlogs() {
   } catch (err) {
     console.error("LOAD BLOG ERROR:", err);
   }
+  console.log("Loading blogs...");
 }
 
 // CREATE BLOG
@@ -44,13 +53,21 @@ document.getElementById("blogForm")?.addEventListener("submit", async (e) => {
   const file = document.getElementById("image").files[0];
   if (file) formData.append("image", file);
 
-  await fetch(API, {
+  const res = await fetch(API, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`
     },
     body: formData
   });
+
+  const data = await res.json();
+  console.log("CREATE BLOG RESPONSE:", data);
+
+  if (!res.ok) {
+    alert(data.message || "Failed to create blog");
+    return;
+  }
 
   loadBlogs();
 });
