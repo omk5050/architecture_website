@@ -1,7 +1,7 @@
 const API = "https://architecture-website-sjh4.onrender.com/api/blogs";
 
 const token = localStorage.getItem("token");
-
+console.log("BLOG JS LOADED");
 if (!token) {
   window.location.href = "login.html";
 }
@@ -68,7 +68,7 @@ document.getElementById("blogForm")?.addEventListener("submit", async (e) => {
     alert(data.message || "Failed to create blog");
     return;
   }
-
+  console.log("FORM SUBMIT TRIGGERED");
   loadBlogs();
 });
 
