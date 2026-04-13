@@ -1,0 +1,208 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-background-tertiary);color:var(--color-text-primary)}
+.wrap{max-width:900px;margin:0 auto;padding:24px 16px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.header h1{font-size:20px;font-weight:500}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--font-sans);transition:opacity 0.15s}
+.btn-blue{background:#378add;color:#fff}
+.btn-blue:hover{opacity:0.88}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn-outline{background:transparent;border:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary)}
+.btn-outline:hover{background:var(--color-background-secondary)}
+.btn-red{background:#fcebeb;color:#a32d2d;border:0.5px solid #f7c1c1}
+.btn-red:hover{background:#f7c1c1}
+
+.form-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:20px;margin-bottom:24px}
+.form-card h2{font-size:15px;font-weight:500;margin-bottom:16px;color:var(--color-text-primary)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.fg label{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.06em}
+.fg input,.fg textarea,.fg select{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px 10px;font-size:13px;color:var(--color-text-primary);background:var(--color-background-secondary);font-family:var(--font-sans);outline:none}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:#378add;box-shadow:0 0 0 2px rgba(55,138,221,0.15)}
+.fg textarea{resize:vertical;min-height:80px;line-height:1.5}
+.form-actions{display:flex;gap:8px;margin-top:4px}
+
+.table-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.table-header h2{font-size:14px;font-weight:500}
+.table-header input{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 10px;font-size:12px;color:var(--color-text-primary);background:var(--color-background-secondary);font-family:var(--font-sans);outline:none;width:180px}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{padding:9px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-tertiary);font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary)}
+td{padding:12px 14px;font-size:13px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--color-background-secondary)}
+.title-cell{font-weight:500;color:var(--color-text-primary)}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
+.badge-published{background:#eaf3de;color:#3b6d11}
+.badge-draft{background:#faeeda;color:#854f0b}
+.badge-archived{background:#f1efe8;color:#5f5e5a}
+.action-btns{display:flex;gap:6px}
+.empty{text-align:center;padding:32px;color:var(--color-text-tertiary);font-size:13px}
+
+@media (max-width: 720px){
+  .wrap{padding:16px 12px}
+  .header{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:18px}
+  .header h1{font-size:18px}
+  .row2,.row3{grid-template-columns:1fr}
+  .form-card{padding:16px}
+  .form-actions{flex-direction:column}
+  .form-actions .btn{width:100%;justify-content:center}
+  .table-header{flex-direction:column;align-items:stretch;gap:10px;padding:14px}
+  .table-header input{width:100%}
+  .table-card{overflow:visible}
+  table,thead,tbody,tr,th,td{display:block;width:100%}
+  thead{display:none}
+  tbody{display:grid;gap:12px;padding:12px}
+  tr{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);overflow:hidden}
+  td{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 12px;white-space:normal;text-align:right}
+  td::before{content:attr(data-label);flex:0 0 92px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--color-text-tertiary);text-align:left}
+  .title-cell{display:block;text-align:left}
+  .title-cell::before{display:block;margin-bottom:6px}
+  .action-btns{width:100%;justify-content:flex-end;flex-wrap:wrap}
+  .action-btns .btn{min-height:36px}
+  .empty{padding:22px 14px}
+}
+</style>
+
+<div class="wrap">
+  <div class="header">
+    <h1>Admin Dashboard</h1>
+    <span style="font-size:12px;color:var(--color-text-tertiary)" id="countLabel">6 posts</span>
+  </div>
+
+  <div class="form-card">
+    <h2 id="formTitle">Create blog post</h2>
+    <div class="fg">
+      <label>Title</label>
+      <input type="text" id="fTitle" placeholder="Enter blog title...">
+    </div>
+    <div class="fg">
+      <label>Content</label>
+      <textarea id="fContent" placeholder="Write your content here..."></textarea>
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Category</label>
+        <select id="fCategory">
+          <option>Architecture</option>
+          <option>Interior Design</option>
+          <option>Urban Planning</option>
+          <option>Sustainability</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Status</label>
+        <select id="fStatus">
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+          <option value="archived">Archived</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-blue" id="submitBtn" onclick="submitPost()">Create post</button>
+      <button class="btn btn-outline" id="cancelBtn" style="display:none" onclick="cancelEdit()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">
+      <h2>All posts</h2>
+      <input type="text" placeholder="Search..." oninput="search(this.value)">
+    </div>
+    <div id="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:38%">Title</th>
+            <th style="width:18%">Category</th>
+            <th style="width:14%">Status</th>
+            <th style="width:14%">Date</th>
+            <th style="width:16%">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let blogs=[
+  {id:1,title:"Revival of Brutalist Architecture",content:"Exploring raw concrete aesthetics in the 21st century.",category:"Architecture",status:"published",date:"Apr 2"},
+  {id:2,title:"Biophilic Design: Bringing Nature Indoors",content:"How natural elements transform workspace productivity.",category:"Interior Design",status:"published",date:"Mar 28"},
+  {id:3,title:"15-Minute Cities",content:"Urban planning's new gold standard for walkable cities.",category:"Urban Planning",status:"draft",date:"Mar 20"},
+  {id:4,title:"Zero-Carbon Building Materials",content:"Hemp concrete, mycelium panels and sustainable builds.",category:"Sustainability",status:"published",date:"Mar 15"},
+  {id:5,title:"The Guggenheim Bilbao Effect",content:"How one building reshaped a city's economy.",category:"Architecture",status:"archived",date:"Mar 8"},
+  {id:6,title:"Smart Glass: Trend or Innovation?",content:"Examining electrochromic glazing in commercial projects.",category:"Architecture",status:"draft",date:"Feb 27"},
+];
+let editId=null,query='';
+
+function render(){
+  const filtered=blogs.filter(b=>b.title.toLowerCase().includes(query)||b.category.toLowerCase().includes(query));
+  document.getElementById('countLabel').textContent=blogs.length+' post'+(blogs.length!==1?'s':'');
+  const tb=document.getElementById('tbody');
+  if(!filtered.length){tb.innerHTML=`<tr><td colspan="5" class="empty">No posts found</td></tr>`;return;}
+  tb.innerHTML=filtered.map(b=>`
+    <tr>
+      <td class="title-cell" data-label="Title" title="${b.title}">${b.title}</td>
+      <td data-label="Category">${b.category}</td>
+      <td data-label="Status"><span class="badge badge-${b.status}">${b.status}</span></td>
+      <td data-label="Date">${b.date}</td>
+      <td data-label="Actions">
+        <div class="action-btns">
+          <button class="btn btn-outline btn-sm" onclick="editPost(${b.id})">Edit</button>
+          <button class="btn btn-red btn-sm" onclick="deletePost(${b.id})">Delete</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function search(q){query=q.toLowerCase();render();}
+
+function submitPost(){
+  const title=document.getElementById('fTitle').value.trim();
+  if(!title)return document.getElementById('fTitle').focus();
+  const now=new Date();
+  const date=now.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const obj={id:editId||Date.now(),title,content:document.getElementById('fContent').value,category:document.getElementById('fCategory').value,status:document.getElementById('fStatus').value,date};
+  if(editId){const i=blogs.findIndex(b=>b.id===editId);blogs[i]=obj;}
+  else blogs.unshift(obj);
+  cancelEdit();render();
+}
+
+function editPost(id){
+  const b=blogs.find(x=>x.id===id);if(!b)return;
+  editId=id;
+  document.getElementById('fTitle').value=b.title;
+  document.getElementById('fContent').value=b.content;
+  document.getElementById('fCategory').value=b.category;
+  document.getElementById('fStatus').value=b.status;
+  document.getElementById('formTitle').textContent='Edit post';
+  document.getElementById('submitBtn').textContent='Save changes';
+  document.getElementById('cancelBtn').style.display='';
+  document.getElementById('fTitle').focus();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function cancelEdit(){
+  editId=null;
+  document.getElementById('fTitle').value='';
+  document.getElementById('fContent').value='';
+  document.getElementById('fCategory').value='Architecture';
+  document.getElementById('fStatus').value='draft';
+  document.getElementById('formTitle').textContent='Create blog post';
+  document.getElementById('submitBtn').textContent='Create post';
+  document.getElementById('cancelBtn').style.display='none';
+}
+
+function deletePost(id){
+  if(!confirm('Delete this post?'))return;
+  blogs=blogs.filter(b=>b.id!==id);render();
+}
+
+render();
+</script>
