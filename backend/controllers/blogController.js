@@ -3,7 +3,7 @@ import { uploadToCloudinary } from "../utils/upload.js";
 
 export const createBlog = async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, category, status } = req.body;
 
     let imageUrl = "";
     if (req.file) {
@@ -13,6 +13,8 @@ export const createBlog = async (req, res) => {
     const blog = await Blog.create({
       title,
       content,
+      category: category || "Architecture",
+      status: status || "draft",
       image: imageUrl
     });
 
@@ -41,9 +43,9 @@ export const getBlogs = async (req, res) => {
 
 export const updateBlog = async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, category, status } = req.body;
 
-    let updateData = { title, content };
+    let updateData = { title, content, category, status };
 
     if (req.file) {
       const imageUrl = await uploadToCloudinary(req.file);

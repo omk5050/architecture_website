@@ -12,6 +12,14 @@ const blogSchema = new mongoose.Schema(
     },
     image: {
       type: String
+    },
+    category: {
+      type: String,
+      default: "Architecture"
+    },
+    status: {
+      type: String,
+      default: "draft"
     }
   },
   { timestamps: true }

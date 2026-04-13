@@ -1,71 +1,100 @@
 const API = "https://architecture-website-sjh4.onrender.com/api/blogs";
-
 const token = localStorage.getItem("token");
-console.log("BLOG JS LOADED");
+
 if (!token) {
   window.location.href = "login.html";
 }
 
-// LOAD BLOGS
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+}
+
+let blogs = [];
+let editId = null;
+let query = '';
+
 async function loadBlogs() {
-  console.log("Loading blogs...");
   try {
     const res = await fetch(API, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      headers: { Authorization: `Bearer ${token}` }
     });
     const data = await res.json();
-    console.log("BLOG DATA:", data);
-
-    if (!data.data) {
-      console.error("No data field in response");
-      return;
+    if (data.data) {
+      blogs = data.data.map(b => ({
+        id: b._id,
+        title: b.title,
+        content: b.content,
+        // The deployed API might not have category/status natively without backend update
+        category: b.category || "Architecture", 
+        status: b.status || "published",
+        date: new Date(b.createdAt || Date.now()).toLocaleDateString('en-US',{month:'short',day:'numeric'}),
+        image: b.image
+      }));
+      render();
     }
-
-    const container = document.getElementById("blogContainer");
-
-    if (!container) {
-      console.error("blogContainer not found");
-      return;
-    }
-
-    data.data.forEach(blog => {
-      container.innerHTML += `
-        <div class="blog-item">
-          <h4>${blog.title}</h4>
-          <p>${blog.content}</p>
-          ${blog.image ? `<img src="${blog.image}" width="200"/>` : ""}
-          <button onclick="deleteBlog('${blog._id}')">Delete</button>
-        </div>
-      `;
-    });
-
   } catch (err) {
     console.error("LOAD BLOG ERROR:", err);
   }
 }
 
-// CREATE BLOG
-const form = document.getElementById("blogForm");
+function render() {
+  const filtered = blogs.filter(b => b.title.toLowerCase().includes(query) || b.category.toLowerCase().includes(query));
+  document.getElementById('countLabel').textContent = blogs.length + ' post' + (blogs.length !== 1 ? 's' : '');
+  const tb = document.getElementById('tbody');
+  
+  if (!filtered.length) {
+    tb.innerHTML = `<tr><td colspan="5" class="empty">No posts found</td></tr>`;
+    return;
+  }
+  
+  tb.innerHTML = filtered.map(b => `
+    <tr>
+      <td class="title-cell" data-label="Title" title="${b.title}">${b.title}</td>
+      <td data-label="Category">${b.category}</td>
+      <td data-label="Status"><span class="badge badge-${b.status}">${b.status}</span></td>
+      <td data-label="Date">${b.date}</td>
+      <td data-label="Actions">
+        <div class="action-btns">
+          <button class="btn btn-outline btn-sm" onclick="editPost('${b.id}')">Edit</button>
+          <button class="btn btn-red btn-sm" onclick="deletePost('${b.id}')">Delete</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
 
-if (!form) {
-  console.error("Form not found");
-} else {
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+function search(q) {
+  query = q.toLowerCase();
+  render();
+}
 
-    console.log("FORM SUBMIT TRIGGERED");
+async function submitPost() {
+  const titleInput = document.getElementById('fTitle');
+  const title = titleInput.value.trim();
+  
+  if (!title) return titleInput.focus();
 
-    const formData = new FormData();
-    formData.append("title", document.getElementById("title").value);
-    formData.append("content", document.getElementById("content").value);
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("content", document.getElementById('fContent').value);
+  formData.append("category", document.getElementById('fCategory').value);
+  formData.append("status", document.getElementById('fStatus').value);
 
-    const file = document.getElementById("image").files[0];
-    if (file) formData.append("image", file);
+  const file = document.getElementById('fImage').files[0];
+  if (file) formData.append("image", file);
 
-    const res = await fetch(API, {
-      method: "POST",
+  const isEdit = !!editId;
+  const url = isEdit ? `${API}/${editId}` : API;
+  const method = isEdit ? "PUT" : "POST";
+
+  const btn = document.getElementById('submitBtn');
+  const orgText = btn.textContent;
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(url, {
+      method,
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -73,15 +102,73 @@ if (!form) {
     });
 
     const data = await res.json();
-    console.log("CREATE BLOG RESPONSE:", data);
+    if (!res.ok) {
+      alert(data.message || "Failed to save blog post");
+    } else {
+      cancelEdit();
+      await loadBlogs();
+    }
+  } catch (err) {
+    console.error("SAVE BLOG ERROR:", err);
+    alert("Error saving blog post");
+  } finally {
+    btn.textContent = orgText;
+    btn.disabled = false;
+  }
+}
+
+function editPost(id) {
+  const b = blogs.find(x => x.id === id);
+  if (!b) return;
+  
+  editId = id;
+  document.getElementById('fTitle').value = b.title;
+  document.getElementById('fContent').value = b.content;
+  document.getElementById('fCategory').value = b.category;
+  document.getElementById('fStatus').value = b.status;
+  document.getElementById('fImage').value = ''; 
+  
+  document.getElementById('formTitle').textContent = 'Edit post';
+  document.getElementById('submitBtn').textContent = 'Save changes';
+  document.getElementById('cancelBtn').style.display = '';
+  document.getElementById('fTitle').focus();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function cancelEdit() {
+  editId = null;
+  document.getElementById('fTitle').value = '';
+  document.getElementById('fContent').value = '';
+  document.getElementById('fCategory').value = 'Architecture';
+  document.getElementById('fStatus').value = 'draft';
+  document.getElementById('fImage').value = '';
+  
+  document.getElementById('formTitle').textContent = 'Create blog post';
+  document.getElementById('submitBtn').textContent = 'Create post';
+  document.getElementById('cancelBtn').style.display = 'none';
+}
+
+async function deletePost(id) {
+  if (!confirm('Delete this post?')) return;
+
+  try {
+    const res = await fetch(`${API}/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
 
     if (!res.ok) {
-      alert(data.message || "Failed to create blog");
+      const data = await res.json();
+      alert(data.message || "Failed to delete blog");
       return;
     }
 
-    loadBlogs();
-  });
+    await loadBlogs();
+  } catch (err) {
+    console.error("DELETE BLOG ERROR:", err);
+  }
 }
 
 // INIT
