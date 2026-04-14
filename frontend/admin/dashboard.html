@@ -1,74 +1,224 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <title>Admin Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio Dashboard | Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--font-sans, "Inter", sans-serif);background:var(--color-background-tertiary, #f4f5f7);color:var(--color-text-primary, #111)}
-    .wrap{max-width:900px;margin:0 auto;padding:24px 16px}
-    .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-    .header h1{font-size:20px;font-weight:500}
-    .header-actions { display: flex; align-items: center; gap: 12px; }
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--border-radius-md, 6px);font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:var(--font-sans, "Inter", sans-serif);transition:opacity 0.15s}
-    .btn-blue{background:#378add;color:#fff}
-    .btn-blue:hover{opacity:0.88}
-    .btn-sm{padding:5px 11px;font-size:12px}
-    .btn-outline{background:transparent;border:0.5px solid var(--color-border-secondary, #ccc);color:var(--color-text-secondary, #444)}
-    .btn-outline:hover{background:var(--color-background-secondary, #eaeaea)}
-    .btn-red{background:#fcebeb;color:#a32d2d;border:0.5px solid #f7c1c1}
-    .btn-red:hover{background:#f7c1c1}
+    :root {
+      /* Replaced glass with a slightly lighter color for better text contrast */
+      --glass: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --accent-blue: #378add;
+      /* Main text color is now brighter */
+      --color-text-primary: #ffffff;
+      /* Label color is a light gray for good separation and contrast */
+      --color-text-secondary: rgba(255, 255, 255, 0.75);
+    }
 
-    .form-card{background:var(--color-background-primary, #fff);border:0.5px solid var(--color-border-tertiary, #e0e0e0);border-radius:var(--border-radius-lg, 8px);padding:20px;margin-bottom:24px}
-    .form-card h2{font-size:15px;font-weight:500;margin-bottom:16px;color:var(--color-text-primary, #111)}
-    .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-    .fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
-    .fg label{font-size:11px;font-weight:500;color:var(--color-text-secondary, #666);text-transform:uppercase;letter-spacing:0.06em}
-    .fg input,.fg textarea,.fg select{border:0.5px solid var(--color-border-secondary, #ccc);border-radius:var(--border-radius-md, 6px);padding:8px 10px;font-size:13px;color:var(--color-text-primary, #111);background:var(--color-background-secondary, #fafafa);font-family:var(--font-sans, "Inter", sans-serif);outline:none}
-    .fg input:focus,.fg textarea:focus,.fg select:focus{border-color:#378add;box-shadow:0 0 0 2px rgba(55,138,221,0.15)}
-    .fg textarea{resize:vertical;min-height:80px;line-height:1.5}
-    .form-actions{display:flex;gap:8px;margin-top:4px}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    .table-card{background:var(--color-background-primary, #fff);border:0.5px solid var(--color-border-tertiary, #e0e0e0);border-radius:var(--border-radius-lg, 8px);overflow:hidden}
-    .table-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:0.5px solid var(--color-border-tertiary, #e0e0e0)}
-    .table-header h2{font-size:14px;font-weight:500}
-    .table-header input{border:0.5px solid var(--color-border-secondary, #ccc);border-radius:var(--border-radius-md, 6px);padding:6px 10px;font-size:12px;color:var(--color-text-primary, #111);background:var(--color-background-secondary, #fafafa);font-family:var(--font-sans, "Inter", sans-serif);outline:none;width:180px}
-    table{width:100%;border-collapse:collapse;table-layout:fixed}
-    th{padding:9px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-tertiary, #888);font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary, #e0e0e0);background:var(--color-background-secondary, #f9f9f9)}
-    td{padding:12px 14px;font-size:13px;color:var(--color-text-secondary, #555);border-bottom:0.5px solid var(--color-border-tertiary, #e0e0e0);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    tr:last-child td{border-bottom:none}
-    tr:hover td{background:var(--color-background-secondary, #fafafa)}
-    .title-cell{font-weight:500;color:var(--color-text-primary, #111)}
-    .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
-    .badge-published{background:#eaf3de;color:#3b6d11}
-    .badge-draft{background:#faeeda;color:#854f0b}
-    .badge-archived{background:#f1efe8;color:#5f5e5a}
-    .action-btns{display:flex;gap:6px}
-    .empty{text-align:center;padding:32px;color:var(--color-text-tertiary, #888);font-size:13px}
+    body {
+      font-family: 'Inter', sans-serif;
+      /* Architectural background with dark overlay for readability */
+      background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
+                  url('https://images.unsplash.com/photo-1487958449943-2429e8be8625?q=80&w=2070&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: var(--color-text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
 
-    @media (max-width: 720px){
-      .wrap{padding:16px 12px}
-      .header{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:18px}
-      .header h1{font-size:18px}
-      .row2,.row3{grid-template-columns:1fr}
-      .form-card{padding:16px}
-      .form-actions{flex-direction:column}
-      .form-actions .btn{width:100%;justify-content:center}
-      .table-header{flex-direction:column;align-items:stretch;gap:10px;padding:14px}
-      .table-header input{width:100%}
-      .table-card{overflow:visible}
-      table,thead,tbody,tr,th,td{display:block;width:100%}
-      thead{display:none}
-      tbody{display:grid;gap:12px;padding:12px}
-      tr{border:0.5px solid var(--color-border-tertiary, #e0e0e0);border-radius:var(--border-radius-md, 6px);background:var(--color-background-primary, #fff);overflow:hidden}
-      td{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 12px;white-space:normal;text-align:right}
-      td::before{content:attr(data-label);flex:0 0 92px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--color-text-tertiary, #888);text-align:left}
-      .title-cell{display:block;text-align:left}
-      .title-cell::before{display:block;margin-bottom:6px}
-      .action-btns{width:100%;justify-content:flex-end;flex-wrap:wrap}
-      .action-btns .btn{min-height:36px}
-      .empty{padding:22px 14px}
+    .wrap {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Header Styling */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 300;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: var(--color-text-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* Card Styling (Glassmorphism) */
+    .form-card, .table-card {
+      background: var(--glass);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    h2 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 25px;
+      color: var(--color-text-primary);
+    }
+
+    /* Form Elements */
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .fg label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .fg input, .fg textarea, .fg select {
+      background: rgba(255, 255, 255, 0.08); /* Darker input for better separation */
+      border: 1px solid var(--glass-border);
+      padding: 12px;
+      color: var(--color-text-primary);
+      font-size: 14px;
+      border-radius: 2px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    /* Input placeholders are now a visible color */
+    .fg input::placeholder, .fg textarea::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .fg input:focus, .fg textarea:focus {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #fff;
+    }
+
+    .fg option { background: #222; color: #fff; }
+
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .btn-blue { background: #fff; color: #000; }
+    .btn-blue:hover { background: var(--accent-blue); color: #fff; }
+
+    .btn-outline { 
+      background: transparent; 
+      border: 1px solid var(--glass-border); 
+      color: var(--color-text-primary); 
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+    .btn-red { background: rgba(255, 107, 107, 0.3); color: #ffcccc; border: 1px solid rgba(255, 107, 107, 0.5); }
+    .btn-red:hover { background: #ff6b6b; color: #fff; }
+
+    .btn-sm { padding: 6px 12px; font-size: 10px; }
+
+    /* Table Styling */
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .table-header input {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      color: var(--color-text-primary);
+      padding: 8px 15px;
+      font-size: 12px;
+      border-radius: 20px;
+      width: 250px;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--color-text-secondary); /* Th is now secondary text color */
+      padding: 15px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    td {
+      padding: 15px;
+      font-size: 13px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 2px;
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    /* Brightened badge text colors for visibility */
+    .badge-published { background: rgba(100, 255, 100, 0.15); color: #88ff88; border: 1px solid rgba(100, 255, 100, 0.3); }
+    .badge-draft { background: rgba(255, 255, 255, 0.15); color: #fff; border: 1px solid var(--glass-border); }
+
+    .action-btns { display: flex; gap: 8px; }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .row2 { grid-template-columns: 1fr; }
+      .header { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .table-header { flex-direction: column; gap: 15px; align-items: flex-start; }
+      .table-header input { width: 100%; }
+      th { display: none; }
+      td { display: block; text-align: right; border: none; padding: 10px 0; }
+      /* Brightened data-label for mobile */
+      td::before { content: attr(data-label); float: left; color: var(--color-text-secondary); font-size: 11px; text-transform: uppercase; }
+      .action-btns { justify-content: flex-end; margin-top: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; }
     }
   </style>
 </head>
@@ -76,26 +226,27 @@
 
 <div class="wrap">
   <div class="header">
-    <h1>Admin Dashboard</h1>
+    <h1>Studio Dashboard</h1>
     <div class="header-actions">
-      <span style="font-size:12px;color:var(--color-text-tertiary, #888)" id="countLabel">0 posts</span>
-      <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+      <span style="font-size:12px; text-transform: uppercase; letter-spacing: 1px; color: var(--color-text-secondary)" id="countLabel">0 items found</span>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
     </div>
   </div>
 
   <div class="form-card">
-    <h2 id="formTitle">Create blog post</h2>
+    <h2 id="formTitle">Record Entry</h2>
     <div class="fg">
-      <label>Title</label>
-      <input type="text" id="fTitle" placeholder="Enter blog title...">
+      <label>Project Title</label>
+      <input type="text" id="fTitle" placeholder="e.g. Modernist Concrete Villa">
     </div>
     <div class="fg">
-      <label>Content</label>
-      <textarea id="fContent" placeholder="Write your content here..."></textarea>
+      <label>Narrative Content</label>
+      <textarea id="fContent" placeholder="Describe the architectural intent..."></textarea>
     </div>
+    
     <div class="row2">
       <div class="fg">
-        <label>Category</label>
+        <label>Sector</label>
         <select id="fCategory">
           <option value="Architecture">Architecture</option>
           <option value="Interior Design">Interior Design</option>
@@ -104,7 +255,7 @@
         </select>
       </div>
       <div class="fg">
-        <label>Status</label>
+        <label>Visibility Status</label>
         <select id="fStatus">
           <option value="draft">Draft</option>
           <option value="published">Published</option>
@@ -112,38 +263,50 @@
         </select>
       </div>
     </div>
+
     <div class="fg">
-      <label>Cover Image</label>
+      <label>High-Res Imagery</label>
       <input type="file" id="fImage">
     </div>
+
     <div class="form-actions">
-      <button class="btn btn-blue" id="submitBtn" onclick="submitPost()">Create post</button>
-      <button class="btn btn-outline" id="cancelBtn" style="display:none" onclick="cancelEdit()">Cancel</button>
+      <button class="btn btn-blue" id="submitBtn" onclick="submitPost()">Publish Entry</button>
+      <button class="btn btn-outline" id="cancelBtn" style="display:none" onclick="cancelEdit()">Discard Changes</button>
     </div>
   </div>
 
   <div class="table-card">
     <div class="table-header">
-      <h2>All posts</h2>
-      <input type="text" placeholder="Search..." oninput="search(this.value)">
+      <h2>Project Index</h2>
+      <input type="text" placeholder="Filter projects..." oninput="search(this.value)">
     </div>
     <div id="tableWrap">
       <table>
         <thead>
           <tr>
             <th style="width:30%">Title</th>
-            <th style="width:18%">Category</th>
-            <th style="width:14%">Status</th>
-            <th style="width:14%">Date</th>
-            <th style="width:24%">Actions</th>
+            <th style="width:20%">Category</th>
+            <th style="width:15%">Status</th>
+            <th style="width:15%">Date</th>
+            <th style="width:20%">Actions</th>
           </tr>
         </thead>
-        <tbody id="tbody"></tbody>
+        <tbody id="tbody">
+          </tbody>
       </table>
     </div>
   </div>
 </div>
 
 <script src="js/blog.js"></script>
+
+<script>
+  // Simple logout function for demonstration
+  function logout() {
+    localStorage.removeItem("token");
+    window.location.href = "login.html"; // Redirection to login page
+  }
+</script>
+
 </body>
 </html>

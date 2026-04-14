@@ -1,53 +1,165 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <title>Admin Login</title>
-  <link rel="stylesheet" href="css/admin.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal | Architecture Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      /* High-quality architectural background */
+      background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+                  url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px); /* Glassmorphism effect */
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 3rem;
+      border-radius: 4px; /* Sharp, architectural edges */
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+
+    h2 {
+      color: #ffffff;
+      font-weight: 300;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    input {
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 12px 5px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: 300;
+    }
+
+    input:focus {
+      border-bottom: 1px solid #ffffff;
+    }
+
+    button {
+      margin-top: 1rem;
+      background: #ffffff;
+      color: #000;
+      border: none;
+      padding: 15px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: #e0e0e0;
+      letter-spacing: 3px;
+    }
+
+    #errorMsg {
+      color: #ff6b6b;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      min-height: 1.2rem;
+    }
+
+    /* Subtle footer */
+    .footer-text {
+      position: absolute;
+      bottom: 20px;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+  </style>
 </head>
 
 <body>
 
   <div class="login-container">
-    <h2>Admin Login</h2>
+    <h2>Admin Access</h2>
 
     <form id="loginForm">
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="password" placeholder="Password" required />
+      <input type="email" id="email" placeholder="EMAIL ADDRESS" required />
+      <input type="password" id="password" placeholder="PASSWORD" required />
 
-      <button type="submit">Login</button>
+      <button type="submit">Enter Studio</button>
       <p id="errorMsg"></p>
     </form>
   </div>
 
-  <script src="js/auth.js"></script>
+  <div class="footer-text">Architectural Systems &copy; 2024</div>
+
   <script>
-    const form = document.querySelector("form");
+    const form = document.querySelector("#loginForm");
+    const errorMsg = document.getElementById("errorMsg");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      errorMsg.textContent = ""; // Clear previous errors
 
-      const email = form.querySelector("input[type=email]").value;
-      const password = form.querySelector("input[type=password]").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-      const res = await fetch("https://architecture-website-sjh4.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ email, password })
-      });
+      try {
+        const res = await fetch("https://architecture-website-sjh4.onrender.com/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email, password })
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (res.ok) {
-        localStorage.setItem("token", data.token);
-        window.location.href = "dashboard.html";
-      } else {
-        alert(data.message);
+        if (res.ok) {
+          localStorage.setItem("token", data.token);
+          window.location.href = "dashboard.html";
+        } else {
+          errorMsg.textContent = data.message || "Invalid credentials";
+        }
+      } catch (err) {
+        errorMsg.textContent = "Server connection failed.";
       }
     });
   </script>
 </body>
-
 </html>
