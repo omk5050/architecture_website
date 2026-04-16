@@ -1,13 +1,17 @@
 import Blog from "../models/Blog.js";
-import { uploadToCloudinary } from "../utils/upload.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../utils/upload.js";
 
 export const createBlog = async (req, res) => {
   try {
     const { title, content, category, status } = req.body;
 
     let imageUrl = "";
+    let cloudinaryId = "";
+
     if (req.file) {
-      imageUrl = await uploadToCloudinary(req.file);
+      const uploaded = await uploadToCloudinary(req.file);
+      imageUrl = uploaded.url;
+      cloudinaryId = uploaded.public_id;
     }
 
     const blog = await Blog.create({
@@ -15,7 +19,8 @@ export const createBlog = async (req, res) => {
       content,
       category: category || "Architecture",
       status: status || "draft",
-      image: imageUrl
+      image: imageUrl,
+      cloudinaryId
     });
 
     res.status(201).json({ success: true, data: blog });
@@ -48,8 +53,15 @@ export const updateBlog = async (req, res) => {
     let updateData = { title, content, category, status };
 
     if (req.file) {
-      const imageUrl = await uploadToCloudinary(req.file);
-      updateData.image = imageUrl;
+      // Delete the old Cloudinary image before uploading the new one
+      const existing = await Blog.findById(req.params.id);
+      if (existing?.cloudinaryId) {
+        await deleteFromCloudinary(existing.cloudinaryId);
+      }
+
+      const uploaded = await uploadToCloudinary(req.file);
+      updateData.image = uploaded.url;
+      updateData.cloudinaryId = uploaded.public_id;
     }
 
     const blog = await Blog.findByIdAndUpdate(
@@ -68,11 +80,30 @@ export const updateBlog = async (req, res) => {
 
 export const deleteBlog = async (req, res) => {
   try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    // Use stored cloudinaryId for a guaranteed-correct deletion.
+    // Falls back to URL-parsing for any legacy posts that predate this fix.
+    if (blog.cloudinaryId) {
+      await deleteFromCloudinary(blog.cloudinaryId);
+    } else if (blog.image) {
+      const urlParts = blog.image.split('/');
+      const lastSegment = urlParts.pop();
+      const folderSegment = urlParts.pop();
+      if (lastSegment && folderSegment) {
+        const public_id = `${folderSegment}/${lastSegment.split('.')[0]}`;
+        await deleteFromCloudinary(public_id);
+      }
+    }
+
     await Blog.findByIdAndDelete(req.params.id);
 
     res.json({
       success: true,
-      message: "Blog deleted"
+      message: "Blog and image deleted"
     });
 
   } catch (error) {

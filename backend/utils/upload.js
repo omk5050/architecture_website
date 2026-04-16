@@ -36,11 +36,23 @@ export const uploadToCloudinary = (file) => {
           console.error("CLOUDINARY ERROR:", error);
           reject(error);
         } else {
-          resolve(result.secure_url);
+          // Return both URL and public_id so controllers can store
+          // the ID for reliable deletion later
+          resolve({ url: result.secure_url, public_id: result.public_id });
         }
       }
     );
 
     streamifier.createReadStream(file.buffer).pipe(stream);
   });
+};
+
+// ✅ Delete function
+export const deleteFromCloudinary = async (public_id) => {
+  if (!public_id) return;
+  try {
+    await cloudinary.uploader.destroy(public_id);
+  } catch (error) {
+    console.error("CLOUDINARY DELETE ERROR:", error);
+  }
 };

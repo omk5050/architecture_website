@@ -53,6 +53,26 @@
     </svg>
   </div>
 
+  <!-- Admin access lock icon -->
+  <a href="admin/login.html" id="admin-lock-btn" title="Admin" aria-label="Admin Login" style="
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 9999;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.25);
+    font-size: 14px;
+    text-decoration: none;
+    transition: color 0.3s ease, transform 0.3s ease;
+  " onmouseover="this.style.color='rgba(255,255,255,0.7)';this.style.transform='scale(1.15)';"
+     onmouseout="this.style.color='rgba(255,255,255,0.25)';this.style.transform='scale(1)';">
+    <i class="fa-solid fa-lock"></i>
+  </a>
+
 
   <!-- side toggle start -->
   <aside class="fix">
@@ -607,6 +627,47 @@
   <script src="assets/vandor/common-js/common.js"></script>
   <script src="assets/js/main.js"></script>
 
+  <script>
+    const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const API_BASE_URL = IS_LOCAL ? 'http://localhost:9090/api' : 'https://cafe-website-gggq.onrender.com/api';
+
+    // Newsletter Logic
+    const subscribeForm = document.getElementById('subscribeForm');
+    if (subscribeForm) {
+      subscribeForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const subLoader = document.getElementById('subLoader');
+        const subMessage = document.getElementById('subMessage');
+        const email = document.getElementById('subEmail').value;
+        const name = document.getElementById('subName')?.value || 'Subscriber';
+
+        subLoader.style.display = 'inline-block';
+        subMessage.innerText = '';
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/subscribe`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, name })
+          });
+          
+          if (!res.ok) {
+            if (res.status === 429) throw new Error("Too many subscriptions. Try later.");
+            throw new Error("Subscription failed");
+          }
+          
+          subscribeForm.reset();
+          subMessage.style.color = 'white';
+          subMessage.innerText = 'Thank you for subscribing! Check your email to verify.';
+        } catch (err) {
+          subMessage.style.color = 'salmon';
+          subMessage.innerText = err.message || 'Offline. Please try again later.';
+        } finally {
+          subLoader.style.display = 'none';
+        }
+      });
+    }
+  </script>
 </body>
 
 </html>
