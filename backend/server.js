@@ -11,6 +11,11 @@ import contactRoutes from "./routes/contactRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import helmet from "helmet";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -77,6 +82,19 @@ app.use("/api/subscribe", subscribeLimiter, subscriberRoutes);
 app.use("/api/admin",  adminRoutes);
 app.use("/api/blogs",  blogRoutes);
 app.use("/api/auth",   authRoutes);
+
+// ─── Serve Frontend ───────────────────────────────────────────────────────────
+// Serve static files (CSS, JS, Images, etc.)
+app.use(express.static(path.join(__dirname, "../frontend")));
+
+// Serve index.html for any other route (handles SPA-like behavior or root access)
+app.get("*", (req, res, next) => {
+  // If it starts with /api, it's a 404 for the API, not the frontend
+  if (req.path.startsWith("/api")) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, "../frontend", "index.html"));
+});
 
 // ─── Health check ─────────────────────────────────────────────────────────────
 app.get("/health", (_, res) => res.json({ status: "ok" }));

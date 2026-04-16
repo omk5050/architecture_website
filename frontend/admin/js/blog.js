@@ -1,4 +1,6 @@
-const API = "https://architecture-website-sjh4.onrender.com/api/blogs";
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_BASE_URL = IS_LOCAL ? 'http://localhost:5000/api' : '/api';
+const API = `${API_BASE_URL}/blogs`;
 const token = localStorage.getItem("token");
 
 if (!token) {

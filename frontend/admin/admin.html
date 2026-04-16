@@ -371,7 +371,7 @@
     const IS_LOCAL = ["localhost", "127.0.0.1"].includes(window.location.hostname);
     const API_BASE_URL = IS_LOCAL
       ? "http://localhost:5000/api"
-      : "https://architecture-website-sjh4.onrender.com/api";
+      : "/api";
 
     // ── Toast ─────────────────────────────────────────────────────────────────
     function showToast(message, type = "success") {

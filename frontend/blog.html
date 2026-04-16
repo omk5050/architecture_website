@@ -278,7 +278,7 @@
     <script src="assets/js/main.js"></script>
     <script>
         const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const API_BASE_URL = IS_LOCAL ? 'http://localhost:9090/api' : 'https://cafe-website-gggq.onrender.com/api';
+        const API_BASE_URL = IS_LOCAL ? 'http://localhost:5000/api' : '/api';
         const API = `${API_BASE_URL}/blogs`;
 
         async function loadBlogs() {
