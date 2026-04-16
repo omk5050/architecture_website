@@ -88,7 +88,7 @@ app.use("/api/auth",   authRoutes);
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 // Serve index.html for any other route (handles SPA-like behavior or root access)
-app.get("(.*)", (req, res, next) => {
+app.get(/.*/, (req, res, next) => {
   // If it starts with /api, it's a 404 for the API, not the frontend
   if (req.path.startsWith("/api")) {
     return next();
