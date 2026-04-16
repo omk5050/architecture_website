@@ -103,14 +103,14 @@ async function submitPost() {
 
     const data = await res.json();
     if (!res.ok) {
-      alert(data.message || "Failed to save blog post");
+      await showAlert("Error", data.message || "Failed to save blog post");
     } else {
       cancelEdit();
       await loadBlogs();
     }
   } catch (err) {
     console.error("SAVE BLOG ERROR:", err);
-    alert("Error saving blog post");
+    await showAlert("Error", "Error saving blog post");
   } finally {
     btn.textContent = orgText;
     btn.disabled = false;
@@ -149,7 +149,8 @@ function cancelEdit() {
 }
 
 async function deletePost(id) {
-  if (!confirm('Delete this post?')) return;
+  const confirmed = await showConfirm('Delete Post', 'Are you sure you want to delete this post? This action cannot be undone.');
+  if (!confirmed) return;
 
   try {
     const res = await fetch(`${API}/${id}`, {
@@ -161,7 +162,7 @@ async function deletePost(id) {
 
     if (!res.ok) {
       const data = await res.json();
-      alert(data.message || "Failed to delete blog");
+      await showAlert("Error", data.message || "Failed to delete blog");
       return;
     }
 
@@ -169,6 +170,51 @@ async function deletePost(id) {
   } catch (err) {
     console.error("DELETE BLOG ERROR:", err);
   }
+}
+
+// CUSTOM MODAL UTILS
+function showConfirm(title, text) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('customModalOverlay');
+    if (!overlay) return resolve(confirm(text));
+    
+    document.getElementById('customModalTitle').textContent = title;
+    document.getElementById('customModalText').textContent = text;
+    
+    const cancelBtn = document.getElementById('customModalCancel');
+    const confirmBtn = document.getElementById('customModalConfirm');
+    
+    cancelBtn.style.display = 'inline-flex';
+    confirmBtn.textContent = 'Confirm';
+    
+    cancelBtn.onclick = () => { overlay.classList.remove('active'); resolve(false); };
+    confirmBtn.onclick = () => { overlay.classList.remove('active'); resolve(true); };
+    
+    overlay.classList.add('active');
+  });
+}
+
+function showAlert(title, text) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('customModalOverlay');
+    if (!overlay) {
+      alert(text);
+      return resolve();
+    }
+    
+    document.getElementById('customModalTitle').textContent = title;
+    document.getElementById('customModalText').textContent = text;
+    
+    const cancelBtn = document.getElementById('customModalCancel');
+    const confirmBtn = document.getElementById('customModalConfirm');
+    
+    cancelBtn.style.display = 'none';
+    confirmBtn.textContent = 'OK';
+    
+    confirmBtn.onclick = () => { overlay.classList.remove('active'); resolve(); };
+    
+    overlay.classList.add('active');
+  });
 }
 
 // INIT

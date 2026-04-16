@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio Vault | Command Center</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    header h1 {
+      font-weight: 300;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: 1.2rem;
+    }
+
+    .stats {
+      font-weight: 300;
+      letter-spacing: 1px;
+      color: #aaa;
+    }
+
+    .stats span {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      background: transparent;
+      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 8px 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    /* ── Layout ── */
+    main {
+      padding: 40px;
+      flex-grow: 1;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 30px;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 30px;
+    }
+
+    .panel h2 {
+      font-weight: 300;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #fff;
+      margin-bottom: 25px;
+      font-size: 1.1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 15px;
+    }
+
+    /* ── Upload Form ── */
+    form { display: flex; flex-direction: column; gap: 15px; }
+    label { font-size: 0.85rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
+    input[type="text"], textarea, input[type="file"] {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 12px;
+      color: #fff;
+      outline: none;
+      width: 100%;
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    input:focus, textarea:focus { border-color: #fff; }
+    
+    .submit-btn {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 15px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .submit-btn:hover:not(:disabled) { background: #ddd; }
+    .submit-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+    
+    #uploadMsg { font-size: 0.85rem; margin-top: 10px; min-height: 1.2em; }
+
+    /* ── Project Archive Cards ── */
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .item-list::-webkit-scrollbar { width: 4px; }
+    .item-list::-webkit-scrollbar-track { background: transparent; }
+    .item-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+    .archive-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 3px solid rgba(255, 255, 255, 0.3);
+      padding: 14px 16px;
+      transition: border-color 0.2s;
+    }
+    .archive-card:hover { border-left-color: #fff; }
+
+    .archive-card-info strong {
+      display: block;
+      color: #fff;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    .archive-card-info span {
+      color: #666;
+      font-size: 0.75rem;
+    }
+
+    /* ── Inquiry Cards ── */
+    .inquiry-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-left: 3px solid #555;
+      transition: border-color 0.2s;
+    }
+    .inquiry-card:hover { border-left-color: rgba(255,255,255,0.5); }
+    .inq-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+    .inq-name { font-weight: 600; color: #fff; }
+    .inq-email { color: #aaa; }
+    .inq-date { color: #888; font-size: 0.8rem; }
+    .inq-body { color: #ddd; font-size: 0.95rem; margin-bottom: 15px; line-height: 1.5; }
+
+    /* ── Buttons ── */
+    .del-btn {
+      flex-shrink: 0;
+      background: transparent;
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 107, 107, 0.5);
+      padding: 6px 14px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .del-btn:hover { background: #ff6b6b; color: #111; border-color: #ff6b6b; }
+
+    .empty-state { color: #555; font-style: italic; font-size: 0.9rem; padding: 10px 0; }
+
+    /* ── Toast Notification ── */
+    #toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      padding: 14px 24px;
+      border-radius: 2px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      z-index: 9999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.success { background: #1a2e1a; border: 1px solid #4ade80; color: #4ade80; }
+    #toast.error   { background: #2e1a1a; border: 1px solid #ff6b6b; color: #ff6b6b; }
+
+    /* ── Confirm Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+    .modal-box {
+      background: #1a1a1a;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 32px;
+      width: 90%;
+      max-width: 380px;
+      text-align: center;
+      transform: translateY(20px);
+      transition: transform 0.25s ease;
+    }
+    .modal-overlay.active .modal-box { transform: translateY(0); }
+
+    .modal-box h3 {
+      font-weight: 300;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+    .modal-box p {
+      color: #aaa;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .modal-actions { display: flex; justify-content: center; gap: 12px; }
+
+    .modal-btn {
+      padding: 10px 24px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .modal-btn-cancel {
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .modal-btn-cancel:hover { background: rgba(255,255,255,0.08); }
+    .modal-btn-confirm {
+      background: #ff6b6b;
+      color: #fff;
+    }
+    .modal-btn-confirm:hover { background: #ff4444; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; padding: 20px; }
+      header { padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Studio Vault</h1>
+    <div class="stats">Subscribers: <span id="subCount">…</span></div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <main>
+    <!-- ── Left Column ── -->
+    <div style="display: flex; flex-direction: column; gap: 30px;">
+
+      <!-- Project Uploader -->
+      <div class="panel">
+        <h2>Project Uploader</h2>
+        <form id="uploadForm">
+          <div>
+            <label>Project Title</label>
+            <input type="text" id="title" required>
+          </div>
+          <div>
+            <label>Description / Content</label>
+            <textarea id="content" required></textarea>
+          </div>
+          <div>
+            <label>High-Res Image</label>
+            <input type="file" id="image" accept="image/*" required>
+          </div>
+          <button type="submit" class="submit-btn" id="uploadBtn">Upload to Portfolio</button>
+          <p id="uploadMsg"></p>
+        </form>
+      </div>
+
+      <!-- Project Archive -->
+      <div class="panel">
+        <h2>Project Archive</h2>
+        <div class="item-list" id="projectList">
+          <p class="empty-state">Loading projects…</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Right Column: Inquiries ── -->
+    <div class="panel">
+      <h2>Inquiry Console</h2>
+      <div class="item-list" id="inquiryList">
+        <p class="empty-state">Loading messages…</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <!-- Confirm Modal -->
+  <div class="modal-overlay" id="confirmOverlay">
+    <div class="modal-box">
+      <h3 id="confirmTitle">Confirm Action</h3>
+      <p id="confirmText">Are you sure you want to proceed?</p>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="confirmCancel">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" id="confirmOk">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Security Check ────────────────────────────────────────────────────────
+    const token = localStorage.getItem("adminToken");
+    if (!token) window.location.href = "login.html";
+
+    // ── API URL: toggles automatically between local dev and production ───────
+    const IS_LOCAL = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+    const API_BASE_URL = IS_LOCAL
+      ? "http://localhost:5000/api"
+      : "https://architecture-website-sjh4.onrender.com/api";
+
+    // ── Toast ─────────────────────────────────────────────────────────────────
+    function showToast(message, type = "success") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = `show ${type}`;
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => { toast.className = ""; }, 3500);
+    }
+
+    // ── Confirm Modal (replaces browser confirm()) ────────────────────────────
+    function showConfirm(title, text) {
+      return new Promise((resolve) => {
+        document.getElementById("confirmTitle").textContent = title;
+        document.getElementById("confirmText").textContent = text;
+        const overlay = document.getElementById("confirmOverlay");
+        overlay.classList.add("active");
+
+        const ok = document.getElementById("confirmOk");
+        const cancel = document.getElementById("confirmCancel");
+
+        function cleanup(result) {
+          overlay.classList.remove("active");
+          ok.replaceWith(ok.cloneNode(true));         // remove old listeners
+          cancel.replaceWith(cancel.cloneNode(true));
+          resolve(result);
+        }
+
+        document.getElementById("confirmOk").addEventListener("click", () => cleanup(true), { once: true });
+        document.getElementById("confirmCancel").addEventListener("click", () => cleanup(false), { once: true });
+      });
+    }
+
+    // ── Logout ────────────────────────────────────────────────────────────────
+    function logout() {
+      localStorage.removeItem("adminToken");
+      window.location.href = "login.html";
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchSubscribers();
+      fetchInquiries();
+      fetchProjects();
+    });
+
+    // ── Subscribers ───────────────────────────────────────────────────────────
+    async function fetchSubscribers() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/subscribe`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const data = await res.json();
+        document.getElementById("subCount").innerText = data.success ? data.count : "Err";
+      } catch {
+        document.getElementById("subCount").innerText = "Offline";
+      }
+    }
+
+    // ── Project Archive ───────────────────────────────────────────────────────
+    async function fetchProjects() {
+      const container = document.getElementById("projectList");
+      try {
+        const res = await fetch(`${API_BASE_URL}/blogs`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (!data.success || data.data.length === 0) {
+          container.innerHTML = '<p class="empty-state">No projects found.</p>';
+          return;
+        }
+
+        container.innerHTML = data.data.map(proj => {
+          const date = new Date(proj.createdAt).toLocaleDateString("en-GB", {
+            day: "numeric", month: "short", year: "numeric"
+          });
+          return `
+            <div class="archive-card">
+              <div class="archive-card-info">
+                <strong>${proj.title}</strong>
+                <span>${proj.category || "Architecture"} &bull; ${date}</span>
+              </div>
+              <button class="del-btn" onclick="deleteProject('${proj._id}', '${proj.title.replace(/'/g, "\\'")}')">
+                Delete
+              </button>
+            </div>
+          `;
+        }).join("");
+      } catch (err) {
+        container.innerHTML = '<p class="empty-state" style="color:salmon;">Failed to load projects.</p>';
+      }
+    }
+
+    window.deleteProject = async function (id, title) {
+      const confirmed = await showConfirm(
+        "Delete Project",
+        `Permanently delete "${title}" and its image from Cloudinary? This cannot be undone.`
+      );
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/blogs/${id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (res.ok) {
+          showToast("Project deleted successfully.");
+          fetchProjects();
+        } else {
+          const data = await res.json();
+          showToast(data.message || "Failed to delete project.", "error");
+        }
+      } catch {
+        showToast("Server error. Could not delete.", "error");
+      }
+    };
+
+    // ── Inquiries ─────────────────────────────────────────────────────────────
+    async function fetchInquiries() {
+      const container = document.getElementById("inquiryList");
+      try {
+        const res = await fetch(`${API_BASE_URL}/contact`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        if (!data.success || data.data.length === 0) {
+          container.innerHTML = '<p class="empty-state">Inbox is empty.</p>';
+          return;
+        }
+
+        container.innerHTML = data.data.map(inq => {
+          const date = new Date(inq.createdAt).toLocaleDateString("en-GB", {
+            day: "numeric", month: "short", year: "numeric"
+          });
+          return `
+            <div class="inquiry-card">
+              <div class="inq-header">
+                <div>
+                  <span class="inq-name">${inq.name}</span><br>
+                  <span class="inq-email">${inq.email}${inq.phone ? " | " + inq.phone : ""}</span>
+                </div>
+                <span class="inq-date">${date}</span>
+              </div>
+              <div class="inq-body">
+                <strong>Project:</strong> ${inq.solution || "N/A"} &nbsp;&bull;&nbsp;
+                <strong>Budget:</strong> ${inq.budget || "N/A"}<br><br>
+                ${inq.message}
+              </div>
+              <button class="del-btn" onclick="deleteInquiry('${inq._id}')">Dismiss</button>
+            </div>
+          `;
+        }).join("");
+      } catch {
+        container.innerHTML = '<p class="empty-state" style="color:salmon;">Failed to connect to server.</p>';
+      }
+    }
+
+    window.deleteInquiry = async function (id) {
+      const confirmed = await showConfirm(
+        "Dismiss Inquiry",
+        "Permanently remove this inquiry from the database?"
+      );
+      if (!confirmed) return;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/contact/${id}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (res.ok) {
+          showToast("Inquiry dismissed.");
+          fetchInquiries();
+        } else {
+          showToast("Failed to dismiss inquiry.", "error");
+        }
+      } catch {
+        showToast("Server error.", "error");
+      }
+    };
+
+    // ── Project Uploader ──────────────────────────────────────────────────────
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const btn = document.getElementById("uploadBtn");
+      const msg = document.getElementById("uploadMsg");
+
+      btn.disabled = true;
+      btn.innerText = "Processing Image… ⏳";
+      msg.innerText = "";
+
+      const formData = new FormData();
+      formData.append("title",   document.getElementById("title").value);
+      formData.append("content", document.getElementById("content").value);
+      formData.append("status",  "published");
+
+      const fileInput = document.getElementById("image");
+      if (fileInput.files.length > 0) {
+        formData.append("image", fileInput.files[0]);
+      }
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/blogs`, {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${token}` },
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          showToast("Project uploaded to portfolio! 🎉");
+          e.target.reset();
+          fetchProjects();   // ← refresh the archive immediately
+        } else {
+          msg.style.color = "#ff6b6b";
+          msg.innerText = data.message || "Upload failed.";
+        }
+      } catch {
+        msg.style.color = "#ff6b6b";
+        msg.innerText = "Server error. Could not upload.";
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Upload to Portfolio";
+      }
+    });
+  </script>
+</body>
+</html>

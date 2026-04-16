@@ -277,7 +277,9 @@
     <script src="assets/vandor/common-js/common.js"></script>
     <script src="assets/js/main.js"></script>
     <script>
-        const API = "https://architecture-website-sjh4.onrender.com/api/blogs";
+        const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE_URL = IS_LOCAL ? 'http://localhost:9090/api' : 'https://cafe-website-gggq.onrender.com/api';
+        const API = `${API_BASE_URL}/blogs`;
 
         async function loadBlogs() {
             try {

@@ -379,6 +379,97 @@
     <script src="assets/vandor/common-js/common.js"></script>
     <script src="assets/js/main.js"></script>
 
+    <script>
+        const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const API_BASE_URL = IS_LOCAL ? 'http://localhost:9090/api' : 'https://cafe-website-gggq.onrender.com/api';
+
+        // Contact Form Logic
+        const contactForm = document.getElementById('contact__form');
+        if (contactForm) {
+            contactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const btnLoader = document.getElementById('btnLoader');
+                const btnText = document.getElementById('btnText');
+                const responseMessage = document.getElementById('response-message');
+                const successContainer = document.getElementById('successContainer');
+                
+                btnLoader.style.display = 'inline-block';
+                btnLoader.innerText = ' ⏳';
+                responseMessage.innerText = '';
+                
+                const payload = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone')?.value,
+                    company: document.getElementById('company')?.value,
+                    budget: document.getElementById('budget')?.value,
+                    solution: document.getElementById('solution')?.value,
+                    message: document.getElementById('message').value
+                };
+
+                try {
+                    const res = await fetch(`${API_BASE_URL}/contact`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!res.ok) {
+                        if (res.status === 429) throw new Error("Too many requests. Please try again later.");
+                        const errorData = await res.json();
+                        throw new Error(errorData.message || "Failed to submit form.");
+                    }
+                    
+                    contactForm.reset();
+                    successContainer.style.display = 'block';
+                    setTimeout(() => { successContainer.style.display = 'none'; }, 5000);
+                } catch (err) {
+                    responseMessage.style.color = 'red';
+                    responseMessage.innerText = err.message || 'Servers might be offline. Please try again later.';
+                } finally {
+                    btnLoader.style.display = 'none';
+                }
+            });
+        }
+
+        // Newsletter Logic
+        const subscribeForm = document.getElementById('subscribeForm');
+        if (subscribeForm) {
+            subscribeForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const subLoader = document.getElementById('subLoader');
+                const subMessage = document.getElementById('subMessage');
+                const email = document.getElementById('subEmail').value;
+                const name = document.getElementById('subName')?.value || 'Subscriber';
+
+                subLoader.style.display = 'inline-block';
+                subMessage.innerText = '';
+
+                try {
+                    const res = await fetch(`${API_BASE_URL}/subscribe`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, name })
+                    });
+                    
+                    if (!res.ok) {
+                        if (res.status === 429) throw new Error("Too many subscriptions. Try later.");
+                        throw new Error("Subscription failed");
+                    }
+                    
+                    subscribeForm.reset();
+                    subMessage.style.color = 'white';
+                    subMessage.innerText = 'Thank you for subscribing! Check your email to verify.';
+                } catch (err) {
+                    subMessage.style.color = 'salmon';
+                    subMessage.innerText = err.message || 'Offline. Please try again later.';
+                } finally {
+                    subLoader.style.display = 'none';
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

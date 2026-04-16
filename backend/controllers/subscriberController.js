@@ -87,3 +87,13 @@ export const verifySubscriber = async (req, res) => {
     res.status(500).send("Server error");
   }
 };
+
+// GET VERIFIED SUBSCRIBERS
+export const getSubscribers = async (req, res) => {
+  try {
+    const subs = await Subscriber.find({ isVerified: true }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, count: subs.length, data: subs });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error fetch subs" });
+  }
+};

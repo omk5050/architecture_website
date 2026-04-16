@@ -13,6 +13,9 @@ const blogSchema = new mongoose.Schema(
     image: {
       type: String
     },
+    cloudinaryId: {
+      type: String
+    },
     category: {
       type: String,
       default: "Architecture"
